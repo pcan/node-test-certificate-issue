@@ -1,0 +1,8 @@
+{
+    "name": "ssl-cert-gen-test",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "node-forge": "^0.7.2"
+    }
+}

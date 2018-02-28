@@ -1,0 +1,39 @@
+
+
+async function generateCert() {
+
+    console.log('Generating 2048-bit CA key-pair...');
+    const keys = await generateKeyPair();
+
+    console.log('Creating self-signed CA certificate...');
+    const cert = forge.pki.createCertificate();
+
+    cert.publicKey = keys.publicKey;
+    // cert.serialNumber = '01'; // useless?
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date();
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 2);
+
+    const attrs = [
+        { name: 'commonName', value: 'ca.localhost' },
+        { name: 'organizationName', value: 'Test CA' }
+    ];
+
+    cert.setSubject(attrs); // Subject === Issuer: this means self signed!
+    cert.setIssuer(attrs); // Subject === Issuer: this means self signed!
+
+    //TODO: test extensions (SAN, etc...)
+
+    cert.sign(keys.privateKey); // Self signed!
+    console.log('CA Certificate created.');
+
+    const pem = {
+        privateKey: forge.pki.privateKeyToPem(keys.privateKey),
+        publicKey: forge.pki.publicKeyToPem(keys.publicKey),
+        certificate: forge.pki.certificateToPem(cert)
+    };
+
+    return pem;
+}
+
+
